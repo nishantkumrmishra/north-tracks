@@ -22,8 +22,8 @@
       --cross: #505050;
       --grid-pattern: rgba(255, 255, 255, 0.025);
       --nav-bg: rgba(7, 7, 7, 0.88);
-      --accent: #00c7ff;
-      --accent-orange: #ff5f00;
+      --accent: #ffffff;
+      --accent-orange: #ffffff;
       --btn-bg: #ffffff;
       --btn-fg: #000000;
       --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -86,6 +86,7 @@
       height: 28px;
       border-radius: 6px;
       display: block;
+      filter: grayscale(1) brightness(1.1);
     }
     .nav-links {
       display: flex;
@@ -316,9 +317,9 @@
       color: var(--fg-dim);
     }
     .badge.latest {
-      border-color: rgba(0, 199, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.4);
       color: var(--accent);
-      background: rgba(0, 199, 255, 0.06);
+      background: rgba(255, 255, 255, 0.08);
     }
     .release-card h3 {
       font-size: 18px;
@@ -717,7 +718,7 @@
     function copyText(str, el) {
       navigator.clipboard.writeText(str).then(() => {
         const orig = el.innerHTML;
-        el.innerHTML = '<span style="color: #00c7ff;">COPIED TO CLIPBOARD</span>';
+        el.innerHTML = '<span style="color: #ffffff;">COPIED TO CLIPBOARD</span>';
         setTimeout(() => {
           el.innerHTML = orig;
         }, 1800);
