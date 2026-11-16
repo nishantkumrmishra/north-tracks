@@ -18,13 +18,13 @@
 
 ---
 
-## ⚡ What is North Tracks?
+## Overview
 
 North Tracks is a minimal music downloader for your terminal. Paste any Spotify playlist, YouTube link, or song title, and it downloads authentic 320kbps audio, tags official HD album covers, embeds lyrics, and neatly organizes everything into folders for you.
 
 ---
 
-## 🚀 How to Get It
+## Installation & Downloads
 
 ### Option A: Standalone Windows App (No Python Required)
 * Download **`NorthTracks.exe`** from [Releases](https://github.com/nishantkumrmishra/north-tracks/releases).
@@ -55,7 +55,7 @@ irm https://raw.githubusercontent.com/nishantkumrmishra/north-tracks/main/instal
 
 ---
 
-## 🎧 First-Time Setup & How to Use
+## Usage Guide
 
 ### 1. First-Time Launch
 When you open North Tracks for the first time, it asks you where you want to save your music:
@@ -100,7 +100,7 @@ North Tracks will automatically:
 
 ---
 
-## ⌨️ Helpful Commands
+## Commands
 
 Type any of these inside North Tracks:
 
@@ -114,6 +114,6 @@ Type any of these inside North Tracks:
 
 ---
 
-## 📄 License
+## License
 
 MIT License © [Nishant Kumar Mishra](https://github.com/nishantkumrmishra)
