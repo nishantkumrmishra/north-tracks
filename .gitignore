@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# North Tracks runtime, local downloads & logs
+downloads/
+*.log
+northtracks.log
+musicdl.log
+config.json
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
