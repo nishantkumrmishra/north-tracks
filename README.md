@@ -1,83 +1,110 @@
-# 🎵 North Tracks — 320k Studio Audio Downloader & Library Engine
+<p align="center">
+  <img src="assets/banner.png" alt="North Tracks Banner" width="100%">
+</p>
 
-> Autonomous 320kbps studio music downloader, dual-tier artwork verifier, and automatic category routing engine.
+<h1 align="center">North Tracks</h1>
+
+<p align="center">
+  <b>Download any song or playlist in 320kbps studio audio. Clean, fast, and organized.</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Audio-320kbps_Studio-00C7FF?style=flat-square" alt="Audio Quality">
+  <img src="https://img.shields.io/badge/Artwork-Apple_HD_%2B_Saavn-orange?style=flat-square" alt="Artwork">
+  <img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-lightgrey?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License">
+</p>
 
 ---
 
-## ⚡ Quick Install
+## ⚡ What is North Tracks?
 
-### 1. One-Click PowerShell Installer (Windows)
-Open PowerShell and run:
+North Tracks is a minimal music downloader for your terminal. Paste any Spotify playlist, YouTube link, or song title, and it downloads authentic 320kbps audio, tags official HD album covers, embeds lyrics, and neatly organizes everything into folders for you.
+
+---
+
+## 📋 What You Need Before Installing
+
+* **Python 3.9 or higher** installed on your computer.  
+  *(If you don't have Python, download it with 1 click from [python.org](https://www.python.org/downloads/) — make sure to check **"Add Python to PATH"** during install).*
+* An active internet connection.
+
+---
+
+## 🚀 How to Install
+
+### Option A: Windows (Easiest — 1-Line Command)
+Open **PowerShell** (search for "PowerShell" in Start menu), paste this single line, and press **Enter**:
+
 ```powershell
 irm https://raw.githubusercontent.com/nishantkumrmishra/north-tracks/main/install.ps1 | iex
 ```
-*This automatically installs dependencies, configures the environment, and creates the global `northtracks` command.*
+*That's it! It automatically sets up everything and creates the `northtracks` command on your PC.*
 
-### 2. Via `pip` from GitHub
+---
+
+### Option B: Any System (Windows, Mac, Linux via pip)
+Open your terminal and run:
+
 ```bash
 pip install git+https://github.com/nishantkumrmishra/north-tracks.git
 ```
 
-Once installed, just type:
+---
+
+## 🎧 How to Use
+
+### 1. Launch North Tracks
+In any terminal or Command Prompt, simply type:
 ```bash
 northtracks
 ```
 
----
+### 2. Paste what you want to download
+You can paste:
+* **Spotify link** (Playlist, Album, or single song)
+* **YouTube link** (Any music video or audio stream)
+* **Song name** (e.g. `Kesariya`, `Heat Waves`, `Alag Aasmaan`)
 
-## 🛠 Manual Installation / Development
+```text
+  North Tracks  •  320k Studio Downloader
+  A:\Devs\Agent\Python\northcodebase\downloads  (81 tracks • 683.4 MB)
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/nishantkumrmishra/north-tracks.git
-   cd north-tracks
-   ```
+  › Paste Spotify/YouTube link, song name, or command (:repair, :dest, :stats, :exit):
+  › https://open.spotify.com/playlist/3ptUtfrX1LoxfXhjIFVPnz
+```
 
-2. **Install requirements:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Run directly:**
-   ```bash
-   python app.py
-   ```
-   *(Or double-click `run.bat` on Windows)*
-
----
-
-## ✨ Features
-
-- **320kbps Studio Master Streams**: Unthrottled JioSaavn DES-ECB CDN stream extraction (`_320` bitrate rewrite) in authentic AAC-LC (`.m4a`).
-- **Universal Link Resolution**: Paste Spotify tracks/playlists/albums, YouTube URLs, or song names directly into the prompt.
-- **Dual-Tier Artwork Verification Pipeline**:
-  - **Tier 1 (Apple iTunes HD)**: Queries official iTunes API for 600×600 / 1000×1000 album artwork.
-  - **Tier 2 (JioSaavn CDN)**: High-speed 500×500 studio album cover repository.
-  - **Tier 3 (YouTube HD)**: High-resolution web thumbnail fallback.
-- **Category-First Library Routing**: Files are organized directly into genre folders (`Indian Indie/`, `Bollywood/`, `Punjabi/`, `Desi Hip-Hop/`, `Pop/`, `Rock/`, `Electronic/`) rather than flat playlist dumps.
-- **Companion `.m3u` Playlists**: Automatically builds relative `.m3u` playlists inside `downloads/Playlists/` so media players keep original track sequencing.
-- **Fuzzy Duplicate Prevention**: Scans the library fingerprint before sending requests, automatically skipping existing tracks and remasters.
-- **Safe `Ctrl+C` Handling**: Streams into `.part` files and atomically renames only upon completion, preventing corrupted partial files.
-- **HTTP Range Resume**: Automatically resumes interrupted downloads from where they stopped.
-- **Built-in Library Repair & Scanner**: Run `:repair` to scan your existing music collection, fix broken tags/artwork, and reorganize files into categories.
-- **Synchronized Lyrics**: Embeds synchronized LRC and plain lyrics via LRCLIB directly into tags.
-- **Silent Diagnostic Logging**: Debug details, headers, and tracebacks are logged silently to `northtracks.log`.
+North Tracks will automatically:
+1. Stream in **320kbps AAC studio audio**.
+2. Download official **HD artwork** from Apple Music and JioSaavn.
+3. Automatically route the song into its category folder (`Indian Indie/`, `Bollywood/`, `Pop/`, `Punjabi/`, etc.).
+4. **Skip duplicates** so you never download the same song twice.
+5. Create a companion `.m3u` playlist so your media player plays it in order.
 
 ---
 
-## 💻 CLI Commands
+## ⌨️ Helpful Commands
 
-Type any of these commands directly into the prompt:
+Type any of these inside North Tracks:
 
-| Command | Action |
+| Command | What it does |
 |---|---|
-| `:stats` | View library category breakdown, file counts, and disk usage |
-| `:repair` | Scan folder, fix broken artwork, and normalize library |
-| `:dest` | Change download destination folder |
-| `:exit` | Quit North Tracks |
-| `b` or `Enter` | Universal back navigation |
+| `:stats` | See all your music categories, number of songs, and size on disk. |
+| `:repair` | Fix broken album art, missing tags, or messy names in any folder. |
+| `:dest` | Change the folder where your songs are saved. |
+| `:exit` | Close North Tracks. |
+| `b` or `Enter` | Go back from any screen. |
+
+---
+
+## 📁 Where does my music get saved?
+
+By default, your music is organized inside your **Music** folder:
+* **Windows**: `C:\Users\<YourName>\Music\NorthTracks`
+* **Custom**: You can change this anytime by typing `:dest` inside the app.
 
 ---
 
 ## 📄 License
+
 MIT License © [Nishant Kumar Mishra](https://github.com/nishantkumrmishra)
