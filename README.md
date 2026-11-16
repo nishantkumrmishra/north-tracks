@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/northtracks/"><img src="https://img.shields.io/pypi/v/northtracks?color=00C7FF&style=flat-square" alt="PyPI"></a>
   <img src="https://img.shields.io/badge/Audio-320kbps_Studio-00C7FF?style=flat-square" alt="Audio Quality">
   <img src="https://img.shields.io/badge/Artwork-Apple_HD_%2B_Saavn-orange?style=flat-square" alt="Artwork">
   <img src="https://img.shields.io/badge/Platform-Windows_%7C_macOS_%7C_Linux-lightgrey?style=flat-square" alt="Platform">
@@ -33,29 +34,29 @@ North Tracks is a minimal music downloader for your terminal. Paste any Spotify 
 
 ## 🚀 How to Install
 
-### Option A: Windows (Easiest — 1-Line Command)
-Open **PowerShell** (search for "PowerShell" in Start menu), paste this single line, and press **Enter**:
+### Option A: Install via `pip` (Recommended)
+Open any terminal (PowerShell, Command Prompt, macOS Terminal, Linux) and run:
+
+```bash
+pip install northtracks
+```
+
+---
+
+### Option B: Windows 1-Click Installer
+Open **PowerShell**, paste this single line, and press **Enter**:
 
 ```powershell
 irm https://raw.githubusercontent.com/nishantkumrmishra/north-tracks/main/install.ps1 | iex
 ```
-*That's it! It automatically sets up everything and creates the `northtracks` command on your PC.*
-
----
-
-### Option B: Any System (Windows, Mac, Linux via pip)
-Open your terminal and run:
-
-```bash
-pip install git+https://github.com/nishantkumrmishra/north-tracks.git
-```
+*That's it! It automatically verifies Python, installs `northtracks`, and sets up the global command.*
 
 ---
 
 ## 🎧 How to Use
 
 ### 1. Launch North Tracks
-In any terminal or Command Prompt, simply type:
+In any terminal, simply type:
 ```bash
 northtracks
 ```
@@ -68,7 +69,7 @@ You can paste:
 
 ```text
   North Tracks  •  320k Studio Downloader
-  A:\Devs\Agent\Python\northcodebase\downloads  (81 tracks • 683.4 MB)
+  C:\Users\...\Music\NorthTracks  (0 tracks • 0.0 MB)
 
   › Paste Spotify/YouTube link, song name, or command (:repair, :dest, :stats, :exit):
   › https://open.spotify.com/playlist/3ptUtfrX1LoxfXhjIFVPnz
