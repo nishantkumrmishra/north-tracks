@@ -4,29 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>North Tracks — 320k Studio Audio Downloader & Library Engine</title>
-  <meta name="description" content="Autonomous 320kbps music downloader and library organizer. Features single-screen terminal UI, Akamai CDN decryption, and dual Apple iTunes HD artwork verification.">
+  <meta name="description" content="Minimalist 320kbps studio music downloader and library organizer. Features single-screen terminal UI, Akamai CDN decryption, and dual Apple iTunes HD artwork verification.">
   <link rel="icon" type="image/x-icon" href="assets/icon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070707;
+      --bg: #050505;
       --bg-card: #0a0a0a;
       --bg-card-hover: #111111;
-      --fg: #f2f2f2;
-      --fg-dim: #b0b0b0;
-      --mut: #666666;
-      --line: #1b1b1b;
-      --line-light: #292929;
-      --cross: #505050;
-      --grid-pattern: rgba(255, 255, 255, 0.025);
-      --nav-bg: rgba(7, 7, 7, 0.88);
+      --fg: #f5f5f5;
+      --fg-dim: #a0a0a0;
+      --mut: #555555;
+      --line: #181818;
+      --line-light: #242424;
+      --line-hover: #383838;
+      --cross: #404040;
+      --grid-pattern: rgba(255, 255, 255, 0.02);
+      --nav-bg: rgba(5, 5, 5, 0.92);
       --accent: #ffffff;
-      --accent-orange: #ffffff;
       --btn-bg: #ffffff;
       --btn-fg: #000000;
       --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: 'Inter Tight', system-ui, -apple-system, sans-serif;
       --pad: clamp(20px, 4vw, 48px);
     }
 
@@ -37,25 +38,26 @@
       background-image: radial-gradient(var(--grid-pattern) 1px, transparent 1px);
       background-size: 24px 24px;
       color: var(--fg);
-      font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+      font-family: var(--sans);
       font-weight: 300;
       line-height: 1.55;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     a { color: inherit; text-decoration: none; }
-    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--pad); }
 
-    /* Top Progress Bar */
+    /* Top Scroll Progress */
     #scrollProgress {
       position: fixed;
       top: 0;
       left: 0;
       height: 2px;
       width: 0%;
-      background: var(--fg);
+      background: #ffffff;
       z-index: 1000;
-      transition: width .1s linear;
+      transition: width .08s linear;
     }
 
     /* Navigation */
@@ -64,7 +66,7 @@
       top: 0;
       z-index: 900;
       background: var(--nav-bg);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--line);
     }
     #nav .wrap {
@@ -81,12 +83,31 @@
       font-size: 15px;
       letter-spacing: -0.01em;
     }
-    .brand img {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      display: block;
-      filter: grayscale(1) brightness(1.1);
+    .brand-icon-box {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      background: #000;
+      border: 1px solid var(--line-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .brand-icon-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(1) brightness(1.15);
+    }
+    .nav-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--mut);
+      padding: 2px 6px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      letter-spacing: 0.05em;
     }
     .nav-links {
       display: flex;
@@ -99,7 +120,7 @@
       color: var(--fg-dim);
       transition: color .2s;
     }
-    .nav-links a:hover { color: var(--fg); }
+    .nav-links a:hover { color: #ffffff; }
     .nav-actions {
       display: flex;
       align-items: center;
@@ -119,11 +140,11 @@
       transition: all .2s;
     }
     .btn-small:hover {
-      background: #181818;
-      border-color: #383838;
+      background: #141414;
+      border-color: var(--line-hover);
     }
 
-    /* Blueprint Decorative Box */
+    /* Blueprint Corner Crosshair Container */
     .blueprint-box {
       position: relative;
       background: var(--bg-card);
@@ -139,6 +160,7 @@
       line-height: 9px;
       text-align: center;
       pointer-events: none;
+      user-select: none;
     }
     .tl { top: -5px; left: -5px; }
     .tr { top: -5px; right: -5px; }
@@ -153,12 +175,12 @@
       text-transform: uppercase;
     }
 
-    /* Top Strip */
+    /* Blueprint Metadata Strip */
     .blueprint-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       border: 1px solid var(--line);
-      margin: 32px 0 44px;
+      margin: 32px 0 48px;
       background: var(--bg-card);
     }
     .bp-cell {
@@ -177,36 +199,59 @@
 
     /* Hero Section */
     .hero {
-      margin-bottom: 72px;
+      margin-bottom: 56px;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--fg-dim);
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border: 1px solid var(--line-light);
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+    .hero-eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
     .hero-top {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 40px;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
       align-items: flex-end;
-      margin-bottom: 36px;
+      margin-bottom: 40px;
     }
     .hero h1 {
-      font-size: clamp(38px, 5.5vw, 68px);
+      font-size: clamp(40px, 5.8vw, 72px);
       font-weight: 300;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
     }
     .hero h1 span { display: block; }
     .hero h1 span i { font-style: italic; font-weight: 300; }
     .hero-right-desc {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 22px;
     }
     .hero-desc {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--fg-dim);
-      line-height: 1.6;
+      line-height: 1.65;
     }
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 12px;
     }
     .btn-primary {
@@ -219,11 +264,12 @@
       font-weight: 500;
       font-size: 13px;
       border-radius: 4px;
-      transition: opacity .2s;
+      transition: opacity .2s, transform .1s;
     }
-    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-primary:active { transform: scale(0.99); }
 
-    /* Interactive Copy Box */
+    /* Interactive Copy Pill */
     .copy-pill {
       display: inline-flex;
       align-items: center;
@@ -234,32 +280,187 @@
       border-radius: 4px;
       font-family: var(--mono);
       font-size: 12px;
-      color: var(--fg-dim);
+      color: var(--fg);
       cursor: pointer;
       user-select: none;
       transition: all .2s;
     }
     .copy-pill:hover {
       background: #141414;
-      border-color: #404040;
-      color: var(--fg);
+      border-color: var(--line-hover);
     }
     .copy-pill .copy-icon {
       color: var(--mut);
-      font-size: 11px;
+      font-size: 10px;
+      letter-spacing: 0.05em;
     }
 
-    /* Terminal Showcase Banner */
-    .hero-banner {
-      width: 100%;
-      border-radius: 6px;
+    /* Live Interactive Terminal Window */
+    .terminal-wrapper {
+      margin-top: 12px;
+      border-radius: 8px;
       overflow: hidden;
-      border: 1px solid var(--line);
-      background: var(--bg-card);
+      border: 1px solid var(--line-light);
+      background: #000000;
+      box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
     }
-    .hero-banner img {
-      width: 100%;
-      display: block;
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: #090909;
+      border-bottom: 1px solid var(--line);
+    }
+    .terminal-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .t-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #222222;
+      border: 1px solid #333333;
+    }
+    .terminal-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--fg-dim);
+      letter-spacing: 0.02em;
+    }
+    .terminal-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .t-tab {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--mut);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .t-tab:hover {
+      color: var(--fg);
+      border-color: var(--line-light);
+    }
+    .t-tab.active {
+      color: #ffffff;
+      background: #161616;
+      border-color: var(--line-light);
+    }
+
+    .terminal-screen {
+      padding: 24px 28px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+      color: #e5e5e5;
+      overflow-x: auto;
+      min-height: 380px;
+    }
+    .terminal-pane { display: none; }
+    .terminal-pane.active { display: block; }
+
+    /* Terminal ASCII Header Box */
+    .t-box {
+      color: var(--mut);
+      margin-bottom: 18px;
+      user-select: none;
+    }
+    .t-box-content {
+      color: #e5e5e5;
+    }
+    .t-bold {
+      font-weight: 600;
+      color: #ffffff;
+    }
+    .t-dim {
+      color: #777777;
+    }
+    .t-cmd-input {
+      color: #ffffff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .t-prompt {
+      color: #888888;
+      font-weight: 600;
+    }
+    .t-url {
+      color: #cccccc;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .t-status {
+      color: #999999;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .t-status-bullet {
+      color: #ffffff;
+      font-size: 10px;
+    }
+    .t-track-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .t-track-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+    .t-idx { color: #555555; width: 55px; }
+    .t-check { color: #ffffff; width: 14px; font-weight: bold; }
+    .t-downloading { color: #ffffff; width: 14px; font-weight: bold; }
+    .t-name { color: #dddddd; min-width: 290px; }
+    .t-bitrate { color: #777777; width: 50px; }
+    .t-genre { color: #ffffff; width: 120px; font-weight: 500; }
+    .t-size { color: #666666; }
+    .t-progress-track {
+      background: #111111;
+      padding: 4px 0;
+      border-radius: 2px;
+    }
+    .t-progress-bar {
+      display: inline-block;
+      letter-spacing: -1px;
+      color: #ffffff;
+    }
+    .t-progress-empty {
+      color: #282828;
+    }
+
+    .t-controls {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid #141414;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      color: #666666;
+      font-size: 11px;
+    }
+    .t-controls kbd {
+      background: #141414;
+      border: 1px solid #282828;
+      border-radius: 3px;
+      padding: 1px 6px;
+      color: #bbbbbb;
+      font-family: var(--mono);
     }
 
     /* Section Header */
@@ -277,7 +478,7 @@
       letter-spacing: -0.01em;
     }
 
-    /* Releases Grid */
+    /* Distribution / Bento Grid */
     .releases-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -299,7 +500,7 @@
     .release-top {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .badge-row {
       display: flex;
@@ -315,15 +516,18 @@
       border-radius: 3px;
       border: 1px solid var(--line-light);
       color: var(--fg-dim);
+      background: transparent;
     }
-    .badge.latest {
-      border-color: rgba(255, 255, 255, 0.4);
-      color: var(--accent);
-      background: rgba(255, 255, 255, 0.08);
+    .badge.recommended {
+      border-color: #444444;
+      color: #ffffff;
+      background: #181818;
+      font-weight: 500;
     }
     .release-card h3 {
       font-size: 18px;
       font-weight: 500;
+      color: #ffffff;
     }
     .release-card p {
       font-size: 13px;
@@ -334,19 +538,29 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #000;
-      border: 1px solid var(--line);
-      padding: 10px 12px;
+      background: #000000;
+      border: 1px solid var(--line-light);
+      padding: 11px 14px;
       border-radius: 4px;
       font-family: var(--mono);
       font-size: 12px;
-      color: #e0e0e0;
+      color: #e5e5e5;
       cursor: pointer;
       user-select: none;
-      transition: border-color .2s;
+      transition: all .2s;
     }
-    .cmd-box:hover { border-color: var(--line-light); }
+    .cmd-box:hover {
+      border-color: var(--line-hover);
+      background: #080808;
+    }
     .cmd-box span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cmd-box .copy-icon {
+      color: var(--mut);
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      margin-left: 10px;
+    }
 
     /* Features Grid */
     .features-grid {
@@ -356,36 +570,46 @@
       margin-bottom: 80px;
     }
     .feature-card {
-      padding: 28px 24px;
+      padding: 30px 26px;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      transition: background .2s, border-color .2s;
+    }
+    .feature-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--line-light);
     }
     .feature-card h3 {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 500;
-      color: var(--fg);
+      color: #ffffff;
+      letter-spacing: -0.01em;
     }
     .feature-card p {
       font-size: 13px;
       color: var(--fg-dim);
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     /* Commands Table */
-    .cmd-table {
-      width: 100%;
-      border-collapse: collapse;
+    .cmd-table-wrap {
+      overflow-x: auto;
       margin-bottom: 80px;
       border: 1px solid var(--line);
       background: var(--bg-card);
     }
-    .cmd-table th, .cmd-table td {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--line);
+    .cmd-table {
+      width: 100%;
+      border-collapse: collapse;
       text-align: left;
+    }
+    .cmd-table th, .cmd-table td {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--line);
       font-size: 13px;
     }
+    .cmd-table tr:last-child td { border-bottom: none; }
     .cmd-table th {
       font-family: var(--mono);
       font-size: 11px;
@@ -393,16 +617,19 @@
       font-weight: 400;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      background: #0d0d0d;
+      background: #080808;
     }
     .cmd-table td.cmd-code {
       font-family: var(--mono);
-      color: var(--accent);
+      color: #ffffff;
       font-size: 12px;
-      width: 160px;
+      font-weight: 500;
+      width: 180px;
+      white-space: nowrap;
     }
     .cmd-table td.cmd-desc {
       color: var(--fg-dim);
+      line-height: 1.5;
     }
 
     /* Footer */
@@ -421,7 +648,7 @@
     .footer-left {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
       font-size: 13px;
       color: var(--mut);
     }
@@ -431,7 +658,7 @@
       font-size: 13px;
       color: var(--fg-dim);
     }
-    .footer-links a:hover { color: var(--fg); }
+    .footer-links a:hover { color: #ffffff; }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -442,6 +669,8 @@
       .releases-grid { grid-template-columns: 1fr; }
       .features-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
+      .terminal-screen { font-size: 11px; padding: 18px 16px; }
+      .t-name { min-width: 180px; }
     }
   </style>
 </head>
@@ -453,11 +682,15 @@
   <nav id="nav">
     <div class="wrap">
       <a class="brand" href="#">
-        <img src="assets/icon.png" alt="North Tracks Icon">
+        <div class="brand-icon-box">
+          <img src="assets/icon.png" alt="North Tracks Icon">
+        </div>
         <span>North Tracks</span>
+        <span class="nav-tag">v1.0.1</span>
       </a>
       <ul class="nav-links">
         <li><a href="#overview">Overview</a></li>
+        <li><a href="#terminal">Terminal</a></li>
         <li><a href="#releases">Releases</a></li>
         <li><a href="#features">Architecture</a></li>
         <li><a href="#commands">Commands</a></li>
@@ -495,6 +728,11 @@
 
     <!-- Hero Section -->
     <section id="overview" class="hero">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        <span>Version 1.0.1 Live Release · Windows Standalone &amp; PyPI</span>
+      </div>
+
       <div class="hero-top">
         <h1>
           <span><i>Studio audio engine.</i></span>
@@ -502,12 +740,12 @@
         </h1>
         <div class="hero-right-desc">
           <p class="hero-desc">
-            North Tracks is a minimal command-line music downloader. Paste any Spotify playlist, YouTube link, or song name — it streams authentic 320k audio, embeds verified HD album covers, and neatly categorizes everything into genre folders.
+            North Tracks is a minimal studio-grade music downloader for Windows, macOS, and Linux. Paste any Spotify playlist, YouTube link, or song query — it extracts authentic 320k streams directly from CDN clusters, embeds verified HD album covers, and autonomously sorts your collection into genre folders.
           </p>
           <div class="hero-actions">
             <a class="btn-primary" href="https://github.com/nishantkumrmishra/north-tracks/releases/download/v1.0.1/NorthTracks.exe">
               <span>Download NorthTracks.exe</span>
-              <span style="font-size: 11px;">(17 MB)</span>
+              <span style="font-size: 11px; font-weight: 400;">(17 MB)</span>
             </a>
             <div class="copy-pill" onclick="copyText('pip install northtracks', this)">
               <span>pip install northtracks</span>
@@ -517,13 +755,165 @@
         </div>
       </div>
 
-      <!-- Hero Terminal Image Preview -->
-      <div class="blueprint-box hero-banner">
-        <span class="cross tl">+</span>
-        <span class="cross tr">+</span>
-        <span class="cross bl">+</span>
-        <span class="cross br">+</span>
-        <img src="assets/banner.png" alt="North Tracks Terminal Interface Screenshot">
+      <!-- Live Terminal Simulation Frame -->
+      <div id="terminal" class="terminal-wrapper">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="t-dot"></span>
+            <span class="t-dot"></span>
+            <span class="t-dot"></span>
+          </div>
+          <div class="terminal-title">northtracks · terminal — 84×22</div>
+          <div class="terminal-tabs">
+            <button class="t-tab active" onclick="switchTab('stream', this)">1. Live Stream</button>
+            <button class="t-tab" onclick="switchTab('stats', this)">2. :stats</button>
+            <button class="t-tab" onclick="switchTab('repair', this)">3. :repair</button>
+          </div>
+        </div>
+
+        <div class="terminal-screen">
+          <!-- Pane 1: Live Stream -->
+          <div id="pane-stream" class="terminal-pane active">
+            <div class="t-box">
+              <div>┌────────────────────────────────────────────────────────────────────────┐</div>
+              <div>│ <span class="t-bold">North Tracks</span>  ·  320k Studio Downloader                             │</div>
+              <div>│ <span class="t-dim">C:\Users\lenovoo\Music\NorthTracks</span>  <span class="t-dim">(14 tracks · 92.4 MB)</span>              │</div>
+              <div>└────────────────────────────────────────────────────────────────────────┘</div>
+            </div>
+
+            <div class="t-cmd-input">
+              <span class="t-prompt">&gt;</span>
+              <span class="t-url">https://open.spotify.com/playlist/3ptUtfrX1LoxfXhjiFVPnz</span>
+            </div>
+
+            <div class="t-status">
+              <span class="t-status-bullet">●</span>
+              <span>Resolving Spotify metadata...</span>
+            </div>
+            <div class="t-status">
+              <span class="t-status-bullet">●</span>
+              <span>Resolving: <span class="t-bold">Chill Mood</span> (64 tracks detected)</span>
+            </div>
+
+            <div class="t-track-list">
+              <div class="t-track-row">
+                <span class="t-idx">[01/64]</span>
+                <span class="t-check">✓</span>
+                <span class="t-name">Prateek Kuhad - Cold / Mess</span>
+                <span class="t-bitrate">320k</span>
+                <span class="t-genre">Indian Indie</span>
+                <span class="t-size">(7.8 MB)</span>
+              </div>
+              <div class="t-track-row">
+                <span class="t-idx">[02/64]</span>
+                <span class="t-check">✓</span>
+                <span class="t-name">Anuv Jain - Baarishein</span>
+                <span class="t-bitrate">320k</span>
+                <span class="t-genre">Indian Indie</span>
+                <span class="t-size">(8.4 MB)</span>
+              </div>
+              <div class="t-track-row">
+                <span class="t-idx">[03/64]</span>
+                <span class="t-check">✓</span>
+                <span class="t-name">Arijit Singh - Kesariya</span>
+                <span class="t-bitrate">320k</span>
+                <span class="t-genre">Bollywood</span>
+                <span class="t-size">(6.2 MB)</span>
+              </div>
+              <div class="t-track-row">
+                <span class="t-idx">[04/64]</span>
+                <span class="t-check">✓</span>
+                <span class="t-name">The Local Train - Choo Lo</span>
+                <span class="t-bitrate">320k</span>
+                <span class="t-genre">Rock</span>
+                <span class="t-size">(9.1 MB)</span>
+              </div>
+              <div class="t-track-row">
+                <span class="t-idx">[05/64]</span>
+                <span class="t-check">✓</span>
+                <span class="t-name">Jasleen Royal - Kho Gaye</span>
+                <span class="t-bitrate">320k</span>
+                <span class="t-genre">Acoustic</span>
+                <span class="t-size">(5.5 MB)</span>
+              </div>
+              <div class="t-track-row t-progress-track">
+                <span class="t-idx">[06/64]</span>
+                <span class="t-downloading">↓</span>
+                <span class="t-name">Twin Strings - Dhaaga</span>
+                <span class="t-progress-bar">[████████░░]</span>
+                <span class="t-genre" style="width: 50px;">78%</span>
+                <span class="t-size">6.4 MB/s</span>
+              </div>
+            </div>
+
+            <div class="t-controls">
+              <span><kbd>Ctrl+C</kbd> Cancel</span>
+              <span><kbd>:stats</kbd> Library</span>
+              <span><kbd>:repair</kbd> Fix Artwork</span>
+              <span><kbd>:dest</kbd> Path</span>
+              <span><kbd>:exit</kbd> Close</span>
+            </div>
+          </div>
+
+          <!-- Pane 2: :stats Dashboard -->
+          <div id="pane-stats" class="terminal-pane">
+            <div class="t-cmd-input">
+              <span class="t-prompt">&gt;</span>
+              <span class="t-bold">:stats</span>
+            </div>
+            <div class="t-box" style="margin-top: 12px;">
+              <div>┌────────────────────────────────────────────────────────────────────────┐</div>
+              <div>│ <span class="t-bold">NORTH TRACKS LIBRARY METRICS</span>                                         │</div>
+              <div>│ <span class="t-dim">Root: C:\Users\lenovoo\Music\NorthTracks</span>                               │</div>
+              <div>└────────────────────────────────────────────────────────────────────────┘</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin: 16px 0;">
+              <div>Total Audio Files   : <span class="t-bold">14 tracks</span></div>
+              <div>Total Storage Usage : <span class="t-bold">92.4 MB</span> (Avg 6.6 MB / track)</div>
+              <div>Native Bitrate Spec : <span class="t-bold">320 kbps AAC-LC</span></div>
+              <div>Artwork Coverage    : <span class="t-bold">100% verified (Apple HD + JioSaavn)</span></div>
+            </div>
+            <div class="t-dim" style="margin: 16px 0 8px;">CATEGORY DISTRIBUTION:</div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div>  · Indian Indie     : 6 tracks (42.8 MB)  [██████████░░░░] 43%</div>
+              <div>  · Bollywood        : 4 tracks (25.1 MB)  [██████░░░░░░░░] 28%</div>
+              <div>  · Rock             : 2 tracks (14.6 MB)  [████░░░░░░░░░░] 14%</div>
+              <div>  · Acoustic / Pop   : 2 tracks (9.9 MB)   [███░░░░░░░░░░░] 15%</div>
+            </div>
+            <div class="t-controls">
+              <span><kbd>Enter</kbd> Return to prompt</span>
+            </div>
+          </div>
+
+          <!-- Pane 3: :repair Engine -->
+          <div id="pane-repair" class="terminal-pane">
+            <div class="t-cmd-input">
+              <span class="t-prompt">&gt;</span>
+              <span class="t-bold">:repair</span>
+            </div>
+            <div class="t-status">
+              <span class="t-status-bullet">●</span>
+              <span>Scanning library at <span class="t-bold">C:\Users\lenovoo\Music\NorthTracks</span>...</span>
+            </div>
+            <div class="t-status">
+              <span class="t-status-bullet">●</span>
+              <span>Indexed 14 tracks across 4 genre folders.</span>
+            </div>
+            <div class="t-track-list" style="margin-top: 14px;">
+              <div class="t-track-row"><span class="t-check">✓</span> <span class="t-name">Cold / Mess</span> <span class="t-dim">Apple iTunes HD verified (1000×1000 master)</span></div>
+              <div class="t-track-row"><span class="t-check">✓</span> <span class="t-name">Baarishein</span> <span class="t-dim">Apple iTunes HD verified (1000×1000 master)</span></div>
+              <div class="t-track-row"><span class="t-check">✓</span> <span class="t-name">Kesariya</span> <span class="t-dim">JioSaavn CDN verified (500×500 cover)</span></div>
+              <div class="t-track-row"><span class="t-check">✓</span> <span class="t-name">Choo Lo</span> <span class="t-dim">Apple iTunes HD verified (1000×1000 master)</span></div>
+            </div>
+            <div style="margin-top: 16px; color: #ffffff;">
+              <span>Repair complete. All 14 tracks have verified metadata and master artwork embedded.</span>
+            </div>
+            <div class="t-controls">
+              <span><kbd>Enter</kbd> Return to prompt</span>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
 
@@ -543,15 +933,15 @@
           <span class="cross br">+</span>
           <div class="release-top">
             <div class="badge-row">
-              <span class="badge latest">Recommended</span>
+              <span class="badge recommended">Recommended</span>
               <span class="badge">Windows x64</span>
             </div>
             <h3>Standalone Executable</h3>
-            <p>Self-contained binary with custom application branding. Runs on any Windows PC with zero Python or dependencies required.</p>
+            <p>Self-contained binary with bundled FFmpeg engine and custom Black N Arrow application icon. Runs on any Windows 10/11 system without installing Python, Git, or dependencies.</p>
           </div>
           <a class="btn-primary" style="justify-content: center;" href="https://github.com/nishantkumrmishra/north-tracks/releases/download/v1.0.1/NorthTracks.exe">
             <span>Download NorthTracks.exe</span>
-            <span style="font-size: 11px;">↓</span>
+            <span style="font-size: 11px; font-weight: 400;">↓</span>
           </a>
         </div>
 
@@ -563,15 +953,15 @@
           <span class="cross br">+</span>
           <div class="release-top">
             <div class="badge-row">
-              <span class="badge">Global</span>
+              <span class="badge">Global CLI</span>
               <span class="badge">Python 3.9+</span>
             </div>
             <h3>PyPI Package</h3>
-            <p>Official package distributed on Python Package Index. Compatible across Windows, macOS, and Linux terminal environments.</p>
+            <p>Official package distributed on Python Package Index. Accessible across Windows PowerShell, macOS zsh, and Linux terminal environments with a single command.</p>
           </div>
           <div class="cmd-box" onclick="copyText('pip install northtracks', this)">
             <span>pip install northtracks</span>
-            <span class="copy-icon" style="color: var(--mut); font-size: 10px;">COPY</span>
+            <span class="copy-icon">COPY</span>
           </div>
         </div>
 
@@ -587,11 +977,11 @@
               <span class="badge">PowerShell</span>
             </div>
             <h3>Windows Setup Script</h3>
-            <p>Single copy-paste script that checks your environment, installs dependencies, and creates the global command instantly.</p>
+            <p>Single copy-paste script that verifies your environment, installs dependencies, and deploys North Tracks to your path in seconds.</p>
           </div>
           <div class="cmd-box" onclick="copyText('irm https://raw.githubusercontent.com/nishantkumrmishra/north-tracks/main/install.ps1 | iex', this)">
             <span>irm .../install.ps1 | iex</span>
-            <span class="copy-icon" style="color: var(--mut); font-size: 10px;">COPY</span>
+            <span class="copy-icon">COPY</span>
           </div>
         </div>
       </div>
@@ -654,48 +1044,50 @@
         <span class="bp-mono">SHORTCUTS</span>
       </div>
 
-      <table class="cmd-table">
-        <thead>
-          <tr>
-            <th>Input Command</th>
-            <th>Description &amp; Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="cmd-code">:stats</td>
-            <td class="cmd-desc">Inspect library category breakdown, total track counts, and disk space usage.</td>
-          </tr>
-          <tr>
-            <td class="cmd-code">:repair</td>
-            <td class="cmd-desc">Scan existing audio files, fix broken tags or names, and re-download official HD artwork.</td>
-          </tr>
-          <tr>
-            <td class="cmd-code">:dest</td>
-            <td class="cmd-desc">Switch the default music storage directory.</td>
-          </tr>
-          <tr>
-            <td class="cmd-code">:exit</td>
-            <td class="cmd-desc">Cleanly close North Tracks.</td>
-          </tr>
-          <tr>
-            <td class="cmd-code">Ctrl+C</td>
-            <td class="cmd-desc">Safely interrupt an active stream without leaving half-written or corrupted files on disk.</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="cmd-table-wrap">
+        <table class="cmd-table">
+          <thead>
+            <tr>
+              <th>Input Command</th>
+              <th>Description &amp; Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cmd-code">:stats</td>
+              <td class="cmd-desc">Inspect library category breakdown, total track counts, and disk space usage.</td>
+            </tr>
+            <tr>
+              <td class="cmd-code">:repair</td>
+              <td class="cmd-desc">Scan existing audio files, fix broken tags or names, and re-download official HD artwork.</td>
+            </tr>
+            <tr>
+              <td class="cmd-code">:dest</td>
+              <td class="cmd-desc">Switch the default music storage directory.</td>
+            </tr>
+            <tr>
+              <td class="cmd-code">:exit</td>
+              <td class="cmd-desc">Cleanly close North Tracks.</td>
+            </tr>
+            <tr>
+              <td class="cmd-code">Ctrl+C</td>
+              <td class="cmd-desc">Safely interrupt an active stream without leaving half-written or corrupted files on disk.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Footer -->
     <footer>
       <div class="footer-grid">
         <div class="footer-left">
-          <strong style="color: var(--fg); font-weight: 500;">North Tracks</strong>
+          <strong style="color: #ffffff; font-weight: 500;">North Tracks</strong>
           <span>Built by <a href="https://github.com/nishantkumrmishra" target="_blank" rel="noopener" style="color: var(--fg-dim); text-decoration: underline;">Nishant Kumar Mishra</a> · Released under MIT License.</span>
         </div>
         <div class="footer-links">
           <a href="https://github.com/nishantkumrmishra/north-tracks" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://pypi.org/project/northtracks/" target="_blank" rel="noopener">PyPI</a>
+          <a href="https://pypi.org/project/northtracks/\" target="_blank" rel="noopener">PyPI</a>
           <a href="https://github.com/nishantkumrmishra/north-tracks/releases" target="_blank" rel="noopener">Releases</a>
           <a href="https://nishantkumrmishra.github.io/nishantkumrmishra/" target="_blank" rel="noopener">Portfolio</a>
         </div>
@@ -711,14 +1103,24 @@
       const st = h.scrollTop || document.body.scrollTop;
       const sh = h.scrollHeight || document.body.scrollHeight;
       const pct = (st / (sh - h.clientHeight)) * 100;
-      document.getElementById('scrollProgress').style.width = pct + '%';
+      const el = document.getElementById('scrollProgress');
+      if (el) el.style.width = pct + '%';
     });
 
-    // Copy helper
+    // Terminal tab switcher
+    function switchTab(name, btn) {
+      document.querySelectorAll('.t-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.terminal-pane').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const pane = document.getElementById('pane-' + name);
+      if (pane) pane.classList.add('active');
+    }
+
+    // 1-Click Copy helper
     function copyText(str, el) {
       navigator.clipboard.writeText(str).then(() => {
         const orig = el.innerHTML;
-        el.innerHTML = '<span style="color: #ffffff;">COPIED TO CLIPBOARD</span>';
+        el.innerHTML = '<span style="color: #ffffff; font-weight: 500;">COPIED TO CLIPBOARD</span>';
         setTimeout(() => {
           el.innerHTML = orig;
         }, 1800);
