@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>North Tracks — 320k Studio Audio Downloader & Library Engine</title>
+  <meta name="description" content="Autonomous 320kbps music downloader and library organizer. Features single-screen terminal UI, Akamai CDN decryption, and dual Apple iTunes HD artwork verification.">
+  <link rel="icon" type="image/x-icon" href="assets/icon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070707;
+      --bg-card: #0a0a0a;
+      --bg-card-hover: #111111;
+      --fg: #f2f2f2;
+      --fg-dim: #b0b0b0;
+      --mut: #666666;
+      --line: #1b1b1b;
+      --line-light: #292929;
+      --cross: #505050;
+      --grid-pattern: rgba(255, 255, 255, 0.025);
+      --nav-bg: rgba(7, 7, 7, 0.88);
+      --accent: #00c7ff;
+      --accent-orange: #ff5f00;
+      --btn-bg: #ffffff;
+      --btn-fg: #000000;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --pad: clamp(20px, 4vw, 48px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(var(--grid-pattern) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--fg);
+      font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+      font-weight: 300;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); }
+
+    /* Top Progress Bar */
+    #scrollProgress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: var(--fg);
+      z-index: 1000;
+      transition: width .1s linear;
+    }
+
+    /* Navigation */
+    #nav {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    #nav .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: block;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      gap: 28px;
+    }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--fg-dim);
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--fg); }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px;
+      border: 1px solid var(--line-light);
+      background: var(--bg-card);
+      color: var(--fg);
+      transition: all .2s;
+    }
+    .btn-small:hover {
+      background: #181818;
+      border-color: #383838;
+    }
+
+    /* Blueprint Decorative Box */
+    .blueprint-box {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+    }
+    .cross {
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      color: var(--cross);
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 9px;
+      text-align: center;
+      pointer-events: none;
+    }
+    .tl { top: -5px; left: -5px; }
+    .tr { top: -5px; right: -5px; }
+    .bl { bottom: -5px; left: -5px; }
+    .br { bottom: -5px; right: -5px; }
+
+    .bp-mono {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--mut);
+      text-transform: uppercase;
+    }
+
+    /* Top Strip */
+    .blueprint-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--line);
+      margin: 32px 0 44px;
+      background: var(--bg-card);
+    }
+    .bp-cell {
+      padding: 16px 20px;
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .bp-cell:last-child { border-right: none; }
+    .bp-cell strong {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--fg);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-bottom: 72px;
+    }
+    .hero-top {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: flex-end;
+      margin-bottom: 36px;
+    }
+    .hero h1 {
+      font-size: clamp(38px, 5.5vw, 68px);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+    .hero h1 span { display: block; }
+    .hero h1 span i { font-style: italic; font-weight: 300; }
+    .hero-right-desc {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .hero-desc {
+      font-size: 16px;
+      color: var(--fg-dim);
+      line-height: 1.6;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      background: var(--btn-bg);
+      color: var(--btn-fg);
+      font-weight: 500;
+      font-size: 13px;
+      border-radius: 4px;
+      transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+
+    /* Interactive Copy Box */
+    .copy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--line-light);
+      padding: 11px 16px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--fg-dim);
+      cursor: pointer;
+      user-select: none;
+      transition: all .2s;
+    }
+    .copy-pill:hover {
+      background: #141414;
+      border-color: #404040;
+      color: var(--fg);
+    }
+    .copy-pill .copy-icon {
+      color: var(--mut);
+      font-size: 11px;
+    }
+
+    /* Terminal Showcase Banner */
+    .hero-banner {
+      width: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--bg-card);
+    }
+    .hero-banner img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Section Header */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+    }
+    .section-head h2 {
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    /* Releases Grid */
+    .releases-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 80px;
+    }
+    .release-card {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      transition: border-color .2s, background .2s;
+    }
+    .release-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--line-light);
+    }
+    .release-top {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid var(--line-light);
+      color: var(--fg-dim);
+    }
+    .badge.latest {
+      border-color: rgba(0, 199, 255, 0.4);
+      color: var(--accent);
+      background: rgba(0, 199, 255, 0.06);
+    }
+    .release-card h3 {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .release-card p {
+      font-size: 13px;
+      color: var(--fg-dim);
+      line-height: 1.6;
+    }
+    .cmd-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #000;
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #e0e0e0;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color .2s;
+    }
+    .cmd-box:hover { border-color: var(--line-light); }
+    .cmd-box span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 80px;
+    }
+    .feature-card {
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--fg);
+    }
+    .feature-card p {
+      font-size: 13px;
+      color: var(--fg-dim);
+      line-height: 1.6;
+    }
+
+    /* Commands Table */
+    .cmd-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 80px;
+      border: 1px solid var(--line);
+      background: var(--bg-card);
+    }
+    .cmd-table th, .cmd-table td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 13px;
+    }
+    .cmd-table th {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--mut);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #0d0d0d;
+    }
+    .cmd-table td.cmd-code {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 12px;
+      width: 160px;
+    }
+    .cmd-table td.cmd-desc {
+      color: var(--fg-dim);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 48px 0 64px;
+      margin-top: 40px;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--mut);
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      font-size: 13px;
+      color: var(--fg-dim);
+    }
+    .footer-links a:hover { color: var(--fg); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .blueprint-strip { grid-template-columns: repeat(2, 1fr); }
+      .bp-cell:nth-child(2) { border-right: none; }
+      .bp-cell:nth-child(1), .bp-cell:nth-child(2) { border-bottom: 1px solid var(--line); }
+      .hero-top { grid-template-columns: 1fr; gap: 24px; }
+      .releases-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="scrollProgress"></div>
+
+  <!-- Navigation -->
+  <nav id="nav">
+    <div class="wrap">
+      <a class="brand" href="#">
+        <img src="assets/icon.png" alt="North Tracks Icon">
+        <span>North Tracks</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#releases">Releases</a></li>
+        <li><a href="#features">Architecture</a></li>
+        <li><a href="#commands">Commands</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a class="btn-small" href="https://github.com/nishantkumrmishra/north-tracks" target="_blank" rel="noopener">
+          <span>GitHub</span>
+          <span style="font-size: 10px;">↗</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="wrap">
+
+    <!-- Blueprint Metadata Strip -->
+    <div class="blueprint-strip">
+      <div class="bp-cell">
+        <span class="bp-mono">01 // AUDIO SPEC</span>
+        <strong>320kbps AAC-LC Studio Master</strong>
+      </div>
+      <div class="bp-cell">
+        <span class="bp-mono">02 // ARTWORK PIPELINE</span>
+        <strong>Apple iTunes HD + JioSaavn</strong>
+      </div>
+      <div class="bp-cell">
+        <span class="bp-mono">03 // DISTRIBUTION</span>
+        <strong>Standalone EXE · PyPI · Script</strong>
+      </div>
+      <div class="bp-cell">
+        <span class="bp-mono">04 // CURRENT RELEASE</span>
+        <strong>v1.0.1 Production (Latest)</strong>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="overview" class="hero">
+      <div class="hero-top">
+        <h1>
+          <span><i>Studio audio engine.</i></span>
+          <span><i>Autonomous library.</i></span>
+        </h1>
+        <div class="hero-right-desc">
+          <p class="hero-desc">
+            North Tracks is a minimal command-line music downloader. Paste any Spotify playlist, YouTube link, or song name — it streams authentic 320k audio, embeds verified HD album covers, and neatly categorizes everything into genre folders.
+          </p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="https://github.com/nishantkumrmishra/north-tracks/releases/download/v1.0.1/NorthTracks.exe">
+              <span>Download NorthTracks.exe</span>
+              <span style="font-size: 11px;">(17 MB)</span>
+            </a>
+            <div class="copy-pill" onclick="copyText('pip install northtracks', this)">
+              <span>pip install northtracks</span>
+              <span class="copy-icon">COPY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Terminal Image Preview -->
+      <div class="blueprint-box hero-banner">
+        <span class="cross tl">+</span>
+        <span class="cross tr">+</span>
+        <span class="cross bl">+</span>
+        <span class="cross br">+</span>
+        <img src="assets/banner.png" alt="North Tracks Terminal Interface Screenshot">
+      </div>
+    </section>
+
+    <!-- Releases Section -->
+    <section id="releases">
+      <div class="section-head">
+        <span class="bp-mono">02 // DISTRIBUTION &amp; RELEASES</span>
+        <span class="bp-mono">VERSION 1.0.1</span>
+      </div>
+
+      <div class="releases-grid">
+        <!-- Card 1: Standalone EXE -->
+        <div class="blueprint-box release-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <div class="release-top">
+            <div class="badge-row">
+              <span class="badge latest">Recommended</span>
+              <span class="badge">Windows x64</span>
+            </div>
+            <h3>Standalone Executable</h3>
+            <p>Self-contained binary with custom application branding. Runs on any Windows PC with zero Python or dependencies required.</p>
+          </div>
+          <a class="btn-primary" style="justify-content: center;" href="https://github.com/nishantkumrmishra/north-tracks/releases/download/v1.0.1/NorthTracks.exe">
+            <span>Download NorthTracks.exe</span>
+            <span style="font-size: 11px;">↓</span>
+          </a>
+        </div>
+
+        <!-- Card 2: PyPI -->
+        <div class="blueprint-box release-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <div class="release-top">
+            <div class="badge-row">
+              <span class="badge">Global</span>
+              <span class="badge">Python 3.9+</span>
+            </div>
+            <h3>PyPI Package</h3>
+            <p>Official package distributed on Python Package Index. Compatible across Windows, macOS, and Linux terminal environments.</p>
+          </div>
+          <div class="cmd-box" onclick="copyText('pip install northtracks', this)">
+            <span>pip install northtracks</span>
+            <span class="copy-icon" style="color: var(--mut); font-size: 10px;">COPY</span>
+          </div>
+        </div>
+
+        <!-- Card 3: PowerShell Script -->
+        <div class="blueprint-box release-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <div class="release-top">
+            <div class="badge-row">
+              <span class="badge">1-Click</span>
+              <span class="badge">PowerShell</span>
+            </div>
+            <h3>Windows Setup Script</h3>
+            <p>Single copy-paste script that checks your environment, installs dependencies, and creates the global command instantly.</p>
+          </div>
+          <div class="cmd-box" onclick="copyText('irm https://raw.githubusercontent.com/nishantkumrmishra/north-tracks/main/install.ps1 | iex', this)">
+            <span>irm .../install.ps1 | iex</span>
+            <span class="copy-icon" style="color: var(--mut); font-size: 10px;">COPY</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture & Features Section -->
+    <section id="features">
+      <div class="section-head">
+        <span class="bp-mono">03 // CORE ENGINE ARCHITECTURE</span>
+        <span class="bp-mono">SPECIFICATION</span>
+      </div>
+
+      <div class="features-grid">
+        <div class="blueprint-box feature-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <span class="bp-mono">FEATURE 01 // AUDIO PIPELINE</span>
+          <h3>Akamai 320k Stream Extraction</h3>
+          <p>Extracts authentic 320kbps AAC-LC studio audio directly from CDN edge clusters using DES-ECB stream decryption and bitrate rewriting, preserving original dynamic range without re-encoding.</p>
+        </div>
+
+        <div class="blueprint-box feature-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <span class="bp-mono">FEATURE 02 // VISUAL IDENTITY</span>
+          <h3>Dual-Tier Artwork Verification</h3>
+          <p>Queries Apple iTunes HD Search API for official 600×600 and 1000×1000 master covers, with automated fallback to JioSaavn's 500×500 high-resolution CDN repository.</p>
+        </div>
+
+        <div class="blueprint-box feature-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <span class="bp-mono">FEATURE 03 // INTELLIGENT ROUTING</span>
+          <h3>Category-First Folder Sorting</h3>
+          <p>Analyzes track artist fingerprints and Devanagari script heuristics to route files directly into genre folders (Indian Indie, Bollywood, Punjabi, Pop, Rock, Hip-Hop) with companion .m3u playlists.</p>
+        </div>
+
+        <div class="blueprint-box feature-card">
+          <span class="cross tl">+</span>
+          <span class="cross tr">+</span>
+          <span class="cross bl">+</span>
+          <span class="cross br">+</span>
+          <span class="bp-mono">FEATURE 04 // USER EXPERIENCE</span>
+          <h3>Zero-Jitter Single-Screen Dashboard</h3>
+          <p>Cleans the terminal screen on launch, updates progress in-place without terminal scroll jumping, and provides clean shortcut controls with safe Ctrl+C atomic cancellation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Commands Table Section -->
+    <section id="commands">
+      <div class="section-head">
+        <span class="bp-mono">04 // COMMAND REFERENCE</span>
+        <span class="bp-mono">SHORTCUTS</span>
+      </div>
+
+      <table class="cmd-table">
+        <thead>
+          <tr>
+            <th>Input Command</th>
+            <th>Description &amp; Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cmd-code">:stats</td>
+            <td class="cmd-desc">Inspect library category breakdown, total track counts, and disk space usage.</td>
+          </tr>
+          <tr>
+            <td class="cmd-code">:repair</td>
+            <td class="cmd-desc">Scan existing audio files, fix broken tags or names, and re-download official HD artwork.</td>
+          </tr>
+          <tr>
+            <td class="cmd-code">:dest</td>
+            <td class="cmd-desc">Switch the default music storage directory.</td>
+          </tr>
+          <tr>
+            <td class="cmd-code">:exit</td>
+            <td class="cmd-desc">Cleanly close North Tracks.</td>
+          </tr>
+          <tr>
+            <td class="cmd-code">Ctrl+C</td>
+            <td class="cmd-desc">Safely interrupt an active stream without leaving half-written or corrupted files on disk.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-left">
+          <strong style="color: var(--fg); font-weight: 500;">North Tracks</strong>
+          <span>Built by <a href="https://github.com/nishantkumrmishra" target="_blank" rel="noopener" style="color: var(--fg-dim); text-decoration: underline;">Nishant Kumar Mishra</a> · Released under MIT License.</span>
+        </div>
+        <div class="footer-links">
+          <a href="https://github.com/nishantkumrmishra/north-tracks" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://pypi.org/project/northtracks/" target="_blank" rel="noopener">PyPI</a>
+          <a href="https://github.com/nishantkumrmishra/north-tracks/releases" target="_blank" rel="noopener">Releases</a>
+          <a href="https://nishantkumrmishra.github.io/nishantkumrmishra/" target="_blank" rel="noopener">Portfolio</a>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const st = h.scrollTop || document.body.scrollTop;
+      const sh = h.scrollHeight || document.body.scrollHeight;
+      const pct = (st / (sh - h.clientHeight)) * 100;
+      document.getElementById('scrollProgress').style.width = pct + '%';
+    });
+
+    // Copy helper
+    function copyText(str, el) {
+      navigator.clipboard.writeText(str).then(() => {
+        const orig = el.innerHTML;
+        el.innerHTML = '<span style="color: #00c7ff;">COPIED TO CLIPBOARD</span>';
+        setTimeout(() => {
+          el.innerHTML = orig;
+        }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>
