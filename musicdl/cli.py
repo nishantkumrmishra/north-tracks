@@ -280,7 +280,49 @@ def screen_repair():
     console.print(f"\n  [green]Done.[/green] [dim]{len(to_repair)} track(s) repaired and verified.[/dim]")
     wait_for_return()
 
+import time
+
+def check_first_run():
+    cfg = load_config()
+    if cfg.get("first_run_completed", False):
+        return
+
+    # If it is an existing repository installation with tracks already downloaded
+    existing_dest = Path(cfg.get("download_dir", ""))
+    if existing_dest.exists() and any(existing_dest.iterdir()) and cfg.get("total_downloads", 0) > 0:
+        set_config_value("first_run_completed", True)
+        return
+
+    clear_screen()
+    default_dir = Path.home() / "Music" / "NorthTracks"
+    console.print()
+    console.print(Panel(
+        "[bold white]Welcome to North Tracks![/bold white]\n"
+        "[dim]Where would you like your music files to be saved?[/dim]",
+        box=box.ROUNDED,
+        border_style="cyan",
+        padding=(1, 2),
+        width=78
+    ))
+    console.print(f"\n  [dim]Default location:[/] [white]{default_dir}[/white]")
+    console.print("  [dim]Press [bold white]Enter[/bold white] to use default, or enter a custom folder path:[/dim]")
+    try:
+        choice = input("  Music Folder › ").strip()
+        if choice and choice.lower() != "b":
+            chosen = Path(choice).resolve()
+        else:
+            chosen = default_dir
+
+        chosen.mkdir(parents=True, exist_ok=True)
+        set_download_dir(str(chosen))
+        set_config_value("first_run_completed", True)
+        console.print(f"\n  [green]✓ Storage folder set to:[/] {chosen}")
+        time.sleep(1.2)
+    except (KeyboardInterrupt, EOFError):
+        set_config_value("first_run_completed", True)
+
 def main():
+    check_first_run()
     while True:
         try:
             dest = get_download_dir()

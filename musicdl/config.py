@@ -21,7 +21,8 @@ DEFAULT_CONFIG = {
     "create_m3u": True,               # Generates .m3u companion for playlists
     "embed_lyrics": True,             # Synchronized / plain lyrics
     "skip_duplicates": True,          # Prevents downloading existing songs
-    "total_downloads": 0
+    "total_downloads": 0,
+    "first_run_completed": False
 }
 
 def load_config() -> dict:

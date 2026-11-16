@@ -27,3 +27,8 @@ config.json
 *.swp
 Thumbs.db
 Desktop.ini
+
+# PyInstaller builds
+build_exe/
+release/
+*.spec

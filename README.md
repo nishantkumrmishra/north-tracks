@@ -24,42 +24,54 @@ North Tracks is a minimal music downloader for your terminal. Paste any Spotify 
 
 ---
 
-## 📋 What You Need Before Installing
+## 🚀 How to Get It
 
-* **Python 3.9 or higher** installed on your computer.  
-  *(If you don't have Python, download it with 1 click from [python.org](https://www.python.org/downloads/) — make sure to check **"Add Python to PATH"** during install).*
-* An active internet connection.
+### Option A: Standalone Windows App (No Python Required)
+* Download **`NorthTracks.exe`** from [Releases](https://github.com/nishantkumrmishra/north-tracks/releases).
+* Double-click it to run immediately. No Python, no setup, no terminal commands required!
 
 ---
 
-## 🚀 How to Install
-
-### Option A: Install via `pip` (Recommended)
-Open any terminal (PowerShell, Command Prompt, macOS Terminal, Linux) and run:
+### Option B: Install via `pip` (Windows, macOS, Linux)
+Open your terminal and run:
 
 ```bash
 pip install northtracks
 ```
 
+Then simply type:
+```bash
+northtracks
+```
+
 ---
 
-### Option B: Windows 1-Click Installer
+### Option C: Windows 1-Click PowerShell Installer
 Open **PowerShell**, paste this single line, and press **Enter**:
 
 ```powershell
 irm https://raw.githubusercontent.com/nishantkumrmishra/north-tracks/main/install.ps1 | iex
 ```
-*That's it! It automatically verifies Python, installs `northtracks`, and sets up the global command.*
 
 ---
 
-## 🎧 How to Use
+## 🎧 First-Time Setup & How to Use
 
-### 1. Launch North Tracks
-In any terminal, simply type:
-```bash
-northtracks
+### 1. First-Time Launch
+When you open North Tracks for the first time, it asks you where you want to save your music:
+```text
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Welcome to North Tracks!                                                   │
+│ Where would you like your music files to be saved?                         │
+└────────────────────────────────────────────────────────────────────────────┘
+
+  Default location: C:\Users\<YourName>\Music\NorthTracks
+  Press Enter to use default, or enter a custom folder path:
+  Music Folder › 
 ```
+*Just press **Enter** to save to your default `Music/NorthTracks` folder, or type any folder path you prefer.*
+
+---
 
 ### 2. Paste what you want to download
 You can paste:
@@ -68,10 +80,14 @@ You can paste:
 * **Song name** (e.g. `Kesariya`, `Heat Waves`, `Alag Aasmaan`)
 
 ```text
-  North Tracks  •  320k Studio Downloader
-  C:\Users\...\Music\NorthTracks  (0 tracks • 0.0 MB)
+┌────────────────────────────────────────────────────────────────────────────┐
+│ NORTH TRACKS  •  320k Studio Engine                 67 tracks  •  577.9 MB │
+│ Storage: ~/Music/NorthTracks                          JioSaavn + iTunes HD │
+└────────────────────────────────────────────────────────────────────────────┘
 
-  › Paste Spotify/YouTube link, song name, or command (:repair, :dest, :stats, :exit):
+  › Paste Spotify / YouTube link or song name:
+  [Ctrl+C] Exit   :stats Library   :repair Fix Artwork   :dest Change Folder
+
   › https://open.spotify.com/playlist/3ptUtfrX1LoxfXhjIFVPnz
 ```
 
@@ -95,14 +111,6 @@ Type any of these inside North Tracks:
 | `:dest` | Change the folder where your songs are saved. |
 | `:exit` | Close North Tracks. |
 | `b` or `Enter` | Go back from any screen. |
-
----
-
-## 📁 Where does my music get saved?
-
-By default, your music is organized inside your **Music** folder:
-* **Windows**: `C:\Users\<YourName>\Music\NorthTracks`
-* **Custom**: You can change this anytime by typing `:dest` inside the app.
 
 ---
 
