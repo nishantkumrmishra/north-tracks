@@ -2,7 +2,7 @@
 
 setup(
     name="northtracks",
-    version="1.0.0",
+    version="1.0.1",
     description="North Tracks - Autonomous 320k Studio Audio Downloader & Organizer",
     author="North Tracks Team",
     packages=find_packages(),
